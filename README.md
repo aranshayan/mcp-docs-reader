@@ -10,7 +10,7 @@ An [MCP](https://modelcontextprotocol.io) server that lets Claude **read your PD
 - **Word (.docx)** — Markdown with headings, lists, bold, tables and links, or plain text.
 - **Excel (.xlsx) / CSV / TSV** — sheet listing, header + rows with paging, cached formula results, ISO dates, automatic CSV delimiter detection.
 - **Sandboxed.** Only folders passed with `--root` are readable; symlinks are resolved first, so a link pointing outside is refused. 25 MB file limit. Read-only.
-- Pure JavaScript, no native dependencies, no network access. Node.js 22+.
+- Pure JavaScript, no native dependencies, no network access. Node.js 22+. Tested in CI on Linux, macOS and Windows with Node 22 and 24.
 
 ## Quick start
 

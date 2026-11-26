@@ -1,6 +1,6 @@
 import { mkdirSync, mkdtempSync, realpathSync, rmSync, symlinkSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
-import { join } from "node:path";
+import { basename, join } from "node:path";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { parsePages } from "../src/files.js";
 import { createServer } from "../src/server.js";
@@ -23,7 +23,7 @@ beforeAll(async () => {
   writeFileSync(join(root, "notes.md"), "# Notes\n" + "x".repeat(5000));
   writeFileSync(join(root, "sub", "deep.txt"), "deep");
   writeFileSync(join(base, "outside", "secret.pdf"), makePdf(["secret"]));
-  symlinkSync(join(base, "outside"), join(root, "link"));
+  symlinkSync(join(base, "outside"), join(root, "link"), process.platform === "win32" ? "junction" : "dir");
   h = await connect(createServer([root]));
 });
 afterAll(async () => {
@@ -45,10 +45,10 @@ describe("documents", () => {
   });
 
   it("lists documents, optionally recursive, skipping symlinked dirs' escape", async () => {
-    const flat = (await call("list_documents")).json.files.map((f: any) => f.path.split("/").pop());
+    const flat = (await call("list_documents")).json.files.map((f: any) => basename(f.path));
     expect(flat).toEqual(expect.arrayContaining(["two.pdf", "report.docx", "sales.xlsx", "people.csv", "notes.md"]));
     expect(flat).not.toContain("deep.txt");
-    const deep = (await call("list_documents", { recursive: true })).json.files.map((f: any) => f.path.split("/").pop());
+    const deep = (await call("list_documents", { recursive: true })).json.files.map((f: any) => basename(f.path));
     expect(deep).toContain("deep.txt");
   });
 
